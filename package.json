@@ -1,0 +1,39 @@
+{
+  "name": "llm-sdk-node",
+  "version": "0.0.1",
+  "description": "This is just another SDK for the common LLM API providers.",
+  "homepage": "https://github.com/adrianhdezm/llm-sdk-node#readme",
+  "keywords": [
+    "llm",
+    "sdk",
+    "node"
+  ],
+  "author": "Adrian Hernandez-Mendez",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adrianhdezm/llm-sdk-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/adrianhdezm/llm-sdk-node/issues"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "package.json"
+  ],
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write . \"src/**/*.{ts,json,mjs,yml}\" --cache",
+    "format:check": "prettier --check . \"src/**/*.{ts,json,mjs,yml}\" --cache",
+    "ci": "npm run build && npm run format:check"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "prettier": "^3.5.1",
+    "typescript": "^5.7.3"
+  }
+}
