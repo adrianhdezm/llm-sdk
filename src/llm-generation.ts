@@ -1,8 +1,9 @@
-import type { GenerateTextParams, GenerateTextResponse } from './llm-models.js';
+import type { GenerateTextParams, GenerateTextResponse } from './models/llm-models.js';
+import type { LLMMessage } from './models/message-models.js';
 
 export async function generateText({ llm, prompt, system, ...options }: GenerateTextParams): Promise<GenerateTextResponse> {
   // Construct the messages array for the LLM provider.
-  const messages = [
+  const messages: LLMMessage[] = [
     { role: 'system' as const, content: system },
     { role: 'user' as const, content: prompt }
   ];

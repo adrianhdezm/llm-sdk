@@ -1,3 +1,5 @@
+import type { LLMMessage } from './message-models.js';
+
 export interface LLMGenerationOptions {
   maxTokens?: number;
   temperature?: number;
@@ -6,23 +8,6 @@ export interface LLMGenerationOptions {
   presencePenalty?: number;
   stopSequences?: string[];
 }
-
-export interface LLMUserMessage {
-  role: 'user';
-  content: string;
-}
-
-export interface LLMSystemMessage {
-  role: 'system';
-  content: string;
-}
-
-export interface LLMAssistantMessage {
-  role: 'assistant';
-  content: string;
-}
-
-export type LLMMessage = LLMUserMessage | LLMSystemMessage | LLMAssistantMessage;
 
 export interface GenerateTextResponse {
   text: string;

@@ -1,4 +1,5 @@
-import type { GenerateTextResponse, LLMGenerationOptions, LLMMessage, LLMProvider } from '../llm-models.js';
+import type { GenerateTextResponse, LLMGenerationOptions, LLMProvider } from '../models/llm-models.js';
+import type { LLMMessage } from '../models/message-models.js';
 
 const API_VERSION = '2025-01-01-preview';
 
