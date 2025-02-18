@@ -19,7 +19,7 @@ const llm = new AzureOpenAIProvider({
   endpoint: 'YOUR_ENDPOINT'
 });
 
-const { text } = generateText({
+const { text } = await generateText({
   llm,
   prompt: 'Write a story about a dragon',
   system: 'you are a helpful assistant'
