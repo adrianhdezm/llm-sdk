@@ -14,13 +14,17 @@ export class AzureOpenAIProvider implements LLMProvider {
     this.#endpoint = endpoint;
   }
 
+  convertMessagesToRequestFormat(messages: LLMMessage[]) {
+    return messages.map(({ role, content }) => ({ role, content }));
+  }
+
   async generateText(messages: LLMMessage[], options?: LLMGenerationOptions): Promise<TextResponse> {
     // URL for the Azure OpenAI API: https://learn.microsoft.com/en-us/azure/ai-services/openai/reference-preview#chat-completions---create.
     const url = `${this.#endpoint}/openai/deployments/${this.#deployment}/chat/completions?api-version=${API_VERSION}`;
 
     // Construct the request body for the Azure OpenAI API.
     const requestBody = {
-      messages: messages.map(({ role, content }) => ({ role, content })),
+      messages: this.convertMessagesToRequestFormat(messages),
       ...(options?.temperature ? { temperature: options?.temperature } : {}),
       ...(options?.topP ? { top_p: options?.topP } : {}),
       ...(options?.maxTokens ? { max_tokens: options?.maxTokens } : {}),
