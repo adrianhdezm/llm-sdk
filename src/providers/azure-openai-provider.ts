@@ -1,4 +1,4 @@
-import type { GenerateTextResponse, LLMGenerationOptions, LLMProvider } from '../models/llm-models.js';
+import type { TextResponse, LLMGenerationOptions, LLMProvider } from '../models/llm-models.js';
 import type { LLMMessage } from '../models/message-models.js';
 
 const API_VERSION = '2025-01-01-preview';
@@ -14,7 +14,7 @@ export class AzureOpenAIProvider implements LLMProvider {
     this.#endpoint = endpoint;
   }
 
-  async generateText(messages: LLMMessage[], options?: LLMGenerationOptions): Promise<GenerateTextResponse> {
+  async generateText(messages: LLMMessage[], options?: LLMGenerationOptions): Promise<TextResponse> {
     // URL for the Azure OpenAI API: https://learn.microsoft.com/en-us/azure/ai-services/openai/reference-preview#chat-completions---create.
     const url = `${this.#endpoint}/openai/deployments/${this.#deployment}/chat/completions?api-version=${API_VERSION}`;
 
@@ -51,6 +51,6 @@ export class AzureOpenAIProvider implements LLMProvider {
       totalTokens: responseBody.usage.total_tokens
     };
 
-    return { text, usage, finishReason };
+    return { text, usage, finishReason, toolCalls: [] };
   }
 }

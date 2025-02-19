@@ -1,4 +1,10 @@
-import type { LLMMessage } from './message-models.js';
+import type { LLMMessage, LLMToolCallSegment } from './message-models.js';
+
+export interface CompletionTokenUsage {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+}
 
 export interface LLMGenerationOptions {
   maxTokens?: number;
@@ -9,22 +15,20 @@ export interface LLMGenerationOptions {
   stopSequences?: string[];
 }
 
-export interface GenerateTextResponse {
+export interface TextResponse {
   text: string;
-  usage: {
-    promptTokens: number;
-    completionTokens: number;
-    totalTokens: number;
-  };
+  usage: CompletionTokenUsage;
   finishReason: 'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown';
+  toolCalls: Array<LLMToolCallSegment>;
+}
+
+export interface FunctionTool {
+  type: 'function';
+  name: string;
+  description: string;
+  parameters: object;
 }
 
 export interface LLMProvider {
-  generateText(messages: LLMMessage[], options?: LLMGenerationOptions): Promise<GenerateTextResponse>;
-}
-
-export interface GenerateTextParams extends LLMGenerationOptions {
-  llm: LLMProvider;
-  prompt: string;
-  system: string;
+  generateText(messages: LLMMessage[], options?: LLMGenerationOptions): Promise<TextResponse>;
 }
