@@ -1,6 +1,6 @@
-import { LLMProvider } from '../llm-provider.js';
-import type { TextResponse, LLMGenerationOptions, FinishReason } from '../models/llm-models.js';
-import type { LLMMessage } from '../models/message-models.js';
+import { LLMProvider } from '../llm-provider';
+import type { TextResponse, LLMGenerationOptions, FinishReason } from '../models/llm-models';
+import type { LLMMessage } from '../models/message-models';
 
 const API_VERSION = '2025-01-01-preview';
 

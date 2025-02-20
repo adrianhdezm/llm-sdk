@@ -1,5 +1,5 @@
-import type { LLMGenerationOptions, TextResponse } from './models/llm-models.js';
-import type { LLMMessage } from './models/message-models.js';
+import type { LLMGenerationOptions, TextResponse } from './models/llm-models';
+import type { LLMMessage } from './models/message-models';
 
 export abstract class LLMProvider {
   abstract getURL(): string;

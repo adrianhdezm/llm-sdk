@@ -1,4 +1,4 @@
-import type { LLMToolCallSegment } from './message-models.js';
+import type { LLMToolCallSegment } from './message-models';
 
 export type FinishReason = 'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown';
 

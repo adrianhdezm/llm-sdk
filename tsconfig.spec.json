@@ -9,6 +9,9 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
 
+    "module": "preserve",
+    "moduleResolution": "bundler",
+
     /* Strictness */
     "strict": true,
     "noUncheckedIndexedAccess": true,

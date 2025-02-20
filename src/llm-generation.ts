@@ -1,6 +1,6 @@
-import type { LLMProvider } from './llm-provider.js';
-import type { FunctionTool, LLMGenerationOptions, TextResponse } from './models/llm-models.js';
-import type { LLMMessage } from './models/message-models.js';
+import type { LLMProvider } from './llm-provider';
+import type { FunctionTool, LLMGenerationOptions, TextResponse } from './models/llm-models';
+import type { LLMMessage } from './models/message-models';
 
 export interface GenerateTextParams extends LLMGenerationOptions {
   llm: LLMProvider;
