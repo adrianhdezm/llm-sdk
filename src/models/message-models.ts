@@ -10,17 +10,10 @@ export interface LLMImageSegment {
 }
 
 export interface LLMToolCallSegment {
-  type: 'tool-call';
-  toolCallId: string;
-  toolName: string;
+  type: 'function';
+  name: string;
   arguments: string;
-}
-
-export interface LLMToolResultSegment {
-  type: 'tool-result';
   toolCallId: string;
-  toolName: string;
-  result: string;
 }
 
 export interface LLMUserMessage {
@@ -35,12 +28,14 @@ export interface LLMSystemMessage {
 
 export interface LLMAssistantMessage {
   role: 'assistant';
-  content: string | Array<LLMTextSegment | LLMToolCallSegment>;
+  content: string | Array<LLMTextSegment>;
+  toolsCall?: Array<LLMToolCallSegment>;
 }
 
 export interface LLMToolMessage {
   role: 'tool';
-  content: Array<LLMToolResultSegment>;
+  content: string;
+  toolCallId: string;
 }
 
 export type LLMMessage = LLMUserMessage | LLMSystemMessage | LLMAssistantMessage | LLMToolMessage;
