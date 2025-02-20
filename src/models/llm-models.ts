@@ -1,4 +1,6 @@
-import type { LLMMessage, LLMToolCallSegment } from './message-models.js';
+import type { LLMToolCallSegment } from './message-models.js';
+
+export type FinishReason = 'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown';
 
 export interface CompletionTokenUsage {
   promptTokens: number;
@@ -18,8 +20,8 @@ export interface LLMGenerationOptions {
 export interface TextResponse {
   text: string;
   usage: CompletionTokenUsage;
-  finishReason: 'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown';
-  toolCalls: Array<LLMToolCallSegment>;
+  finishReason: FinishReason;
+  toolCalls?: Array<LLMToolCallSegment>;
 }
 
 export interface FunctionTool {
@@ -27,8 +29,4 @@ export interface FunctionTool {
   name: string;
   description: string;
   parameters: object;
-}
-
-export interface LLMProvider {
-  generateText(messages: LLMMessage[], options?: LLMGenerationOptions): Promise<TextResponse>;
 }
