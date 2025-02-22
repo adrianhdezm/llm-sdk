@@ -19,7 +19,7 @@ export async function generateText({
   ...options
 }: GenerateTextParams): Promise<TextResponse> {
   // Construct the messages array for the LLM provider.
-  const conversation: LLMMessage[] = [{ role: 'system', content: system }, { role: 'user', content: prompt }, ...messages];
+  const conversation: LLMMessage[] = [{ role: 'system', content: system }, ...messages, { role: 'user', content: prompt }];
 
   // Call the LLM provider's generateText function with the constructed messages and options.
   const response = await llm.generateText(conversation, options);

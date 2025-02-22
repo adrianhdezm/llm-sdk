@@ -25,6 +25,34 @@ export class AzureOpenAIProvider extends LLMProvider {
   }
 
   transformMessage(message: LLMMessage): Record<string, unknown> {
+    if (message.role === 'system') {
+      return { role: message.role, content: message.content };
+    } else if (message.role === 'user') {
+      if (Array.isArray(message.content)) {
+        const content = message.content.map((part) => {
+          if (part.type === 'text') {
+            return { type: 'text', text: part.text };
+          } else if (part.type === 'image') {
+            return { type: 'image_url', image_url: { url: part.image } };
+          }
+        });
+        return { role: message.role, content };
+      } else {
+        return { role: message.role, content: message.content };
+      }
+    } else if (message.role === 'assistant') {
+      if (Array.isArray(message.content)) {
+        const content = message.content.map((part) => {
+          if (part.type === 'text') {
+            return { type: 'text', text: part.text };
+          }
+        });
+        return { role: message.role, content };
+      } else {
+        return { role: message.role, content: message.content };
+      }
+    }
+
     return { role: message.role, content: message.content };
   }
 
