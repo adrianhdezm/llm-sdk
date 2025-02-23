@@ -8,4 +8,5 @@ export * from './models/llm-models';
 export * from './llm-generation';
 
 // Re-export providers
+export * from './llm-provider';
 export * from './providers/azure-openai-provider';
