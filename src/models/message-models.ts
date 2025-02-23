@@ -28,8 +28,8 @@ export interface LLMSystemMessage {
 
 export interface LLMAssistantMessage {
   role: 'assistant';
-  content: string | Array<LLMTextSegment>;
-  toolsCall?: Array<LLMToolCallSegment>;
+  content: null | string | Array<LLMTextSegment>;
+  toolCalls?: Array<LLMToolCallSegment>;
 }
 
 export interface LLMToolMessage {

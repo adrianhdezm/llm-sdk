@@ -40,6 +40,48 @@ describe('AzureOpenAIProvider', () => {
 
         expect(adaptedMessage).toEqual({ role: 'assistant', content: [{ type: 'text', text: 'The picture looks like a modern kitchen' }] });
       });
+
+      it('should correctly format toolCalls', () => {
+        const message: LLMMessage = {
+          role: 'assistant',
+          content: null,
+          toolCalls: [
+            {
+              type: 'function',
+              toolCallId: 'call_abc123',
+              name: 'get_current_weather',
+              arguments: '{\n"location": "Boston, MA"\n}'
+            }
+          ]
+        };
+
+        const adaptedMessage = provider.transformMessage(message);
+
+        expect(adaptedMessage).toEqual({
+          role: 'assistant',
+          content: null,
+          tool_calls: [
+            {
+              id: 'call_abc123',
+              type: 'function',
+              function: {
+                name: 'get_current_weather',
+                arguments: '{\n"location": "Boston, MA"\n}'
+              }
+            }
+          ]
+        });
+      });
+    });
+
+    describe('role:tool', () => {
+      it('should correctly format a message', () => {
+        const message: LLMMessage = { role: 'tool', content: '42', toolCallId: 'call_abc123' };
+
+        const adaptedMessage = provider.transformMessage(message);
+
+        expect(adaptedMessage).toEqual({ role: 'tool', content: '42', tool_call_id: 'call_abc123' });
+      });
     });
 
     describe('role:user', () => {

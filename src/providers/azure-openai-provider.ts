@@ -48,12 +48,26 @@ export class AzureOpenAIProvider extends LLMProvider {
           }
         });
         return { role: message.role, content };
+      } else if (Array.isArray(message.toolCalls) && message.toolCalls.length > 0) {
+        const toolCalls = message.toolCalls.map((toolCall) => {
+          return {
+            id: toolCall.toolCallId,
+            type: 'function',
+            function: {
+              name: toolCall.name,
+              arguments: toolCall.arguments
+            }
+          };
+        });
+        return { role: message.role, content: null, tool_calls: toolCalls };
       } else {
         return { role: message.role, content: message.content };
       }
+    } else if (message.role === 'tool') {
+      return { role: message.role, content: message.content, tool_call_id: message.toolCallId };
+    } else {
+      throw new Error(`Invalid message role: ${message}`);
     }
-
-    return { role: message.role, content: message.content };
   }
 
   transformGenerationOptions(options: LLMGenerationOptions): Record<string, unknown> {
