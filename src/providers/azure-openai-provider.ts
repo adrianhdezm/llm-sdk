@@ -95,9 +95,14 @@ export class AzureOpenAIProvider extends LLMProvider {
 
   transformGenerationResponse(data: Record<string, unknown>): TextResponse {
     const responseData = data as {
-      choices: { message: { content: string }; finish_reason: FinishReason }[];
+      choices: {
+        message: {
+          content: string | null;
+          tool_calls?: Array<{ function: { arguments: string; name: string }; id: string; type: 'function' }>;
+        };
+        finish_reason: FinishReason;
+      }[];
       usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
-      tool_calls?: Array<{ function: { arguments: string; name: string }; id: string; type: 'function' }>;
     };
 
     return {
@@ -108,9 +113,9 @@ export class AzureOpenAIProvider extends LLMProvider {
         totalTokens: responseData.usage.total_tokens
       },
       finishReason: responseData.choices[0]!.finish_reason,
-      ...(responseData.tool_calls
+      ...(responseData.choices[0]!.message.tool_calls
         ? {
-            toolCalls: responseData.tool_calls.map((toolCall) => {
+            toolCalls: responseData.choices[0]!.message.tool_calls.map((toolCall) => {
               return {
                 type: 'function',
                 toolCallId: toolCall.id,
