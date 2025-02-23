@@ -31,7 +31,7 @@ export class AzureOpenAIProvider extends LLMProvider {
         name: tool.name,
         description: tool.description,
         parameters: tool.parameters,
-        strict: true
+        ...(tool.strict ? { strict: tool.strict } : {})
       }
     };
   }
