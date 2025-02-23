@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AzureOpenAIProvider } from '../../../src/providers/azure-openai-provider';
 import { LLMMessage } from '../../../src/models/message-models';
+import { LLMTool } from '../../../src/models/llm-models';
 
 describe('AzureOpenAIProvider', () => {
   let provider: AzureOpenAIProvider;
@@ -10,6 +11,49 @@ describe('AzureOpenAIProvider', () => {
       apiKey: 'test-api-key',
       deployment: 'test-deployment',
       endpoint: 'https://test-endpoint'
+    });
+  });
+
+  describe('transformToolCall', () => {
+    it('should correctly format a tool with json schema parameters', () => {
+      const tool: LLMTool = {
+        type: 'function',
+        name: 'get_current_weather',
+        description: 'Get the current weather in a given location',
+        parameters: {
+          type: 'object',
+          properties: {
+            location: {
+              type: 'string',
+              description: 'The city and state, e.g. San Francisco, CA'
+            },
+            unit: { type: 'string', enum: ['celsius', 'fahrenheit'] }
+          },
+          required: ['location']
+        }
+      };
+
+      const adaptedTool = provider.transformToolCall(tool);
+
+      expect(adaptedTool).toEqual({
+        type: 'function',
+        function: {
+          name: 'get_current_weather',
+          description: 'Get the current weather in a given location',
+          strict: true,
+          parameters: {
+            type: 'object',
+            properties: {
+              location: {
+                type: 'string',
+                description: 'The city and state, e.g. San Francisco, CA'
+              },
+              unit: { type: 'string', enum: ['celsius', 'fahrenheit'] }
+            },
+            required: ['location']
+          }
+        }
+      });
     });
   });
 

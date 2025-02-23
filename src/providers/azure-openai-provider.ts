@@ -1,5 +1,5 @@
 import { LLMProvider } from '../llm-provider';
-import type { TextResponse, LLMGenerationOptions, FinishReason } from '../models/llm-models';
+import type { TextResponse, LLMGenerationOptions, FinishReason, LLMTool } from '../models/llm-models';
 import type { LLMMessage } from '../models/message-models';
 
 const API_VERSION = '2025-01-01-preview';
@@ -22,6 +22,18 @@ export class AzureOpenAIProvider extends LLMProvider {
 
   getRequestHeaders(): Record<string, string> {
     return { 'api-key': this.#apiKey };
+  }
+
+  transformToolCall(tool: LLMTool): Record<string, unknown> {
+    return {
+      type: 'function',
+      function: {
+        name: tool.name,
+        description: tool.description,
+        parameters: tool.parameters,
+        strict: true
+      }
+    };
   }
 
   transformMessage(message: LLMMessage): Record<string, unknown> {

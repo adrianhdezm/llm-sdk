@@ -30,3 +30,5 @@ export interface FunctionTool {
   description: string;
   parameters: object;
 }
+
+export type LLMTool = FunctionTool;
