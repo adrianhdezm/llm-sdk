@@ -29,6 +29,7 @@ export abstract class LLMProvider {
       body: JSON.stringify(body)
     });
     if (!response.ok) {
+      console.error(response);
       throw new Error(`Failed to generate text: ${response.statusText}`);
     }
     const data = await response.json();
