@@ -97,7 +97,9 @@ export class AzureOpenAIProvider extends LLMProvider {
     const responseData = data as {
       choices: { message: { content: string }; finish_reason: FinishReason }[];
       usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+      tool_calls?: Array<{ function: { arguments: string; name: string }; id: string; type: 'function' }>;
     };
+
     return {
       text: responseData.choices[0]!.message.content,
       usage: {
@@ -105,7 +107,19 @@ export class AzureOpenAIProvider extends LLMProvider {
         completionTokens: responseData.usage.completion_tokens,
         totalTokens: responseData.usage.total_tokens
       },
-      finishReason: responseData.choices[0]!.finish_reason
+      finishReason: responseData.choices[0]!.finish_reason,
+      ...(responseData.tool_calls
+        ? {
+            toolCalls: responseData.tool_calls.map((toolCall) => {
+              return {
+                type: 'function',
+                toolCallId: toolCall.id,
+                name: toolCall.function.name,
+                arguments: toolCall.function.arguments
+              };
+            })
+          }
+        : {})
     };
   }
 }

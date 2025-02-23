@@ -18,7 +18,7 @@ export interface LLMGenerationOptions {
 }
 
 export interface TextResponse {
-  text: string;
+  text: string | null;
   usage: CompletionTokenUsage;
   finishReason: FinishReason;
   toolCalls?: Array<LLMToolCallSegment>;
