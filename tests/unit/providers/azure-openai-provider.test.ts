@@ -40,7 +40,6 @@ describe('AzureOpenAIProvider', () => {
         function: {
           name: 'get_current_weather',
           description: 'Get the current weather in a given location',
-          strict: true,
           parameters: {
             type: 'object',
             properties: {
