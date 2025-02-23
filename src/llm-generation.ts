@@ -5,15 +5,15 @@ import type { LLMMessage } from './models/message-models';
 export interface GenerateTextParams extends LLMGenerationOptions {
   llm: LLMProvider;
   prompt: string;
-  system: string;
-  tools: LLMTool[];
-  messages: LLMMessage[];
+  system?: string;
+  tools?: LLMTool[];
+  messages?: LLMMessage[];
 }
 
 export async function generateText({
   llm,
   prompt,
-  system,
+  system = 'You are a helpful assistant.',
   messages = [],
   tools = [],
   ...options
