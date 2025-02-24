@@ -119,26 +119,26 @@ export class AzureOpenAIProvider extends LLMProvider {
     return {
       message: {
         role: 'assistant',
-        content: responseData.choices[0]!.message.content
+        content: responseData.choices[0]!.message.content,
+        ...(responseData.choices[0]!.message.tool_calls
+          ? {
+              toolCalls: responseData.choices[0]!.message.tool_calls.map((toolCall) => {
+                return {
+                  type: 'function',
+                  toolCallId: toolCall.id,
+                  name: toolCall.function.name,
+                  arguments: toolCall.function.arguments
+                };
+              })
+            }
+          : {})
       },
       usage: {
         promptTokens: responseData.usage.prompt_tokens,
         completionTokens: responseData.usage.completion_tokens,
         totalTokens: responseData.usage.total_tokens
       },
-      finishReason: responseData.choices[0]!.finish_reason,
-      ...(responseData.choices[0]!.message.tool_calls
-        ? {
-            toolCalls: responseData.choices[0]!.message.tool_calls.map((toolCall) => {
-              return {
-                type: 'function',
-                toolCallId: toolCall.id,
-                name: toolCall.function.name,
-                arguments: toolCall.function.arguments
-              };
-            })
-          }
-        : {})
+      finishReason: responseData.choices[0]!.finish_reason
     };
   }
 }
