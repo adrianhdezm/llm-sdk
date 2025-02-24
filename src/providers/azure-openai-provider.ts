@@ -2,22 +2,32 @@ import { LLMProvider } from '../llm-provider';
 import type { TextResponse, LLMGenerationOptions, FinishReason, LLMTool } from '../models/llm-models';
 import type { LLMMessage } from '../models/message-models';
 
-const API_VERSION = '2025-01-01-preview';
-
 export class AzureOpenAIProvider extends LLMProvider {
   #apiKey: string;
   #deployment: string;
   #endpoint: string;
+  #apiVersion: string;
 
-  constructor({ apiKey, deployment, endpoint }: { apiKey: string; deployment: string; endpoint: string }) {
+  constructor({
+    apiKey,
+    deployment,
+    endpoint,
+    apiVersion = '2025-01-01-preview'
+  }: {
+    apiKey: string;
+    deployment: string;
+    endpoint: string;
+    apiVersion?: string;
+  }) {
     super();
     this.#apiKey = apiKey;
     this.#deployment = deployment;
     this.#endpoint = endpoint;
+    this.#apiVersion = apiVersion;
   }
 
   getURL(): string {
-    return `${this.#endpoint}/openai/deployments/${this.#deployment}/chat/completions?api-version=${API_VERSION}`;
+    return `${this.#endpoint}/openai/deployments/${this.#deployment}/chat/completions?api-version=${this.#apiVersion}`;
   }
 
   getRequestHeaders(): Record<string, string> {
