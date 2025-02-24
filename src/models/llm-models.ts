@@ -1,5 +1,3 @@
-import type { LLMToolCallSegment } from './message-models';
-
 export type FinishReason = 'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown';
 
 export interface CompletionTokenUsage {
@@ -8,7 +6,7 @@ export interface CompletionTokenUsage {
   totalTokens: number;
 }
 
-export interface LLMGenerationOptions {
+export interface LLMOptions {
   maxTokens?: number;
   temperature?: number;
   topP?: number;
@@ -16,20 +14,3 @@ export interface LLMGenerationOptions {
   presencePenalty?: number;
   stopSequences?: string[];
 }
-
-export interface TextResponse {
-  text: string | null;
-  usage: CompletionTokenUsage;
-  finishReason: FinishReason;
-  toolCalls?: Array<LLMToolCallSegment>;
-}
-
-export interface FunctionTool {
-  type: 'function';
-  name: string;
-  description: string;
-  parameters: object;
-  strict?: boolean;
-}
-
-export type LLMTool = FunctionTool;

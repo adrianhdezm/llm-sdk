@@ -1,6 +1,7 @@
-import { LLMProvider } from '../llm-provider';
-import type { TextResponse, LLMGenerationOptions, FinishReason, LLMTool } from '../models/llm-models';
-import type { LLMMessage } from '../models/message-models';
+import { LLMProvider, type AssistantMessageResponse } from '../llm-provider';
+import type { FinishReason, LLMOptions } from '../models/llm-models';
+import type { LLMMessage } from '../models/llm-message-models';
+import type { LLMTool } from '../models/llm-tool-models';
 
 export class AzureOpenAIProvider extends LLMProvider {
   #apiKey: string;
@@ -92,7 +93,7 @@ export class AzureOpenAIProvider extends LLMProvider {
     }
   }
 
-  transformGenerationOptions(options: LLMGenerationOptions): Record<string, unknown> {
+  transformOptions(options: LLMOptions): Record<string, unknown> {
     return {
       ...(options.maxTokens ? { max_tokens: options.maxTokens } : {}),
       ...(options.temperature ? { temperature: options.temperature } : {}),
@@ -103,7 +104,7 @@ export class AzureOpenAIProvider extends LLMProvider {
     };
   }
 
-  transformGenerationResponse(data: Record<string, unknown>): TextResponse {
+  transformMessageResponse(data: Record<string, unknown>): AssistantMessageResponse {
     const responseData = data as {
       choices: {
         message: {
@@ -116,7 +117,10 @@ export class AzureOpenAIProvider extends LLMProvider {
     };
 
     return {
-      text: responseData.choices[0]!.message.content,
+      message: {
+        role: 'assistant',
+        content: responseData.choices[0]!.message.content
+      },
       usage: {
         promptTokens: responseData.usage.prompt_tokens,
         completionTokens: responseData.usage.completion_tokens,

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { AzureOpenAIProvider } from '../../../src/providers/azure-openai-provider';
-import { LLMMessage } from '../../../src/models/message-models';
-import { LLMTool } from '../../../src/models/llm-models';
+import { LLMMessage } from '../../../src/models/llm-message-models';
+import { LLMTool } from '../../../src/models/llm-tool-models';
 
 describe('AzureOpenAIProvider', () => {
   let provider: AzureOpenAIProvider;

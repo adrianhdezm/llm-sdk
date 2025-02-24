@@ -28,7 +28,7 @@ export interface LLMSystemMessage {
 
 export interface LLMAssistantMessage {
   role: 'assistant';
-  content: null | string | Array<LLMTextSegment>;
+  content: null | string | LLMTextSegment[];
   toolCalls?: Array<LLMToolCallSegment>;
 }
 

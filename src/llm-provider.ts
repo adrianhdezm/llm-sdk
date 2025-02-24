@@ -1,5 +1,12 @@
-import type { LLMGenerationOptions, LLMTool, TextResponse } from './models/llm-models';
-import type { LLMMessage } from './models/message-models';
+import type { CompletionTokenUsage, FinishReason, LLMOptions } from './models/llm-models';
+import type { LLMAssistantMessage, LLMMessage } from './models/llm-message-models';
+import type { LLMTool } from './models/llm-tool-models';
+
+export interface AssistantMessageResponse {
+  message: LLMAssistantMessage;
+  usage: CompletionTokenUsage;
+  finishReason: FinishReason;
+}
 
 export abstract class LLMProvider {
   abstract getURL(): string;
@@ -7,17 +14,17 @@ export abstract class LLMProvider {
 
   abstract transformMessage(message: LLMMessage): Record<string, unknown>;
   abstract transformToolCall(tool: LLMTool): Record<string, unknown>;
-  abstract transformGenerationOptions(options: LLMGenerationOptions): Record<string, unknown>;
-  abstract transformGenerationResponse(data: Record<string, unknown>): TextResponse;
+  abstract transformOptions(options: LLMOptions): Record<string, unknown>;
+  abstract transformMessageResponse(data: Record<string, unknown>): AssistantMessageResponse;
 
-  async generateText(messages: LLMMessage[], tools?: LLMTool[], options?: LLMGenerationOptions): Promise<TextResponse> {
+  async createAssistantMessage(messages: LLMMessage[], tools?: LLMTool[], options?: LLMOptions): Promise<AssistantMessageResponse> {
     const url = this.getURL();
     const headers = this.getRequestHeaders();
 
     const body = {
       messages: messages.map(this.transformMessage),
       ...(tools && tools.length > 0 ? { tools: tools.map(this.transformToolCall) } : {}),
-      ...(options ? this.transformGenerationOptions(options) : {})
+      ...(options ? this.transformOptions(options) : {})
     };
 
     const response = await fetch(url, {
@@ -34,8 +41,8 @@ export abstract class LLMProvider {
       throw new Error(`Failed to generate text: ${response.statusText}`);
     }
     const data = await response.json();
-    const textResponse = this.transformGenerationResponse(data);
+    const messageResponse = this.transformMessageResponse(data);
 
-    return textResponse;
+    return messageResponse;
   }
 }
