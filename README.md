@@ -21,7 +21,6 @@ const llm = new AzureOpenAIProvider({
 
 const { text } = await generateText({
   llm,
-  system: 'you are a helpful assistant',
-  prompt: 'Write a story about a dragon'
+  messages: [{ role: 'user', content: 'Write a story single sentence about a dragon' }]
 });
 ```

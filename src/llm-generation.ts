@@ -4,30 +4,15 @@ import type { LLMMessage } from './models/message-models';
 
 export interface GenerateTextParams extends LLMGenerationOptions {
   llm: LLMProvider;
-  prompt?: string;
-  system?: string;
+  messages: LLMMessage[];
   tools?: LLMTool[];
-  messages?: LLMMessage[];
 }
 
-export async function generateText({
-  llm,
-  prompt,
-  system,
-  messages = [],
-  tools = [],
-  ...options
-}: GenerateTextParams): Promise<TextResponse> {
-  const systemPrompt: LLMMessage[] = system
-    ? [{ role: 'system', content: system }]
-    : [{ role: 'system', content: 'You are a helpful assistant.' }];
+export async function generateText({ llm, messages, tools = [], ...options }: GenerateTextParams): Promise<TextResponse> {
+  // Construct a conversation array from the messages.
+  const conversation: LLMMessage[] = [...messages];
 
-  const userPrompt: LLMMessage[] = prompt ? [{ role: 'user', content: prompt }] : [];
-
-  // Construct the messages array for the LLM provider.
-  const conversation: LLMMessage[] = [...systemPrompt, ...messages, ...userPrompt];
-
-  // Call the LLM provider's generateText function with the constructed messages and options.
+  // Generate the text from the LLM provider.
   const response = await llm.generateText(conversation, tools, options);
 
   // Return the response from the LLM provider.
