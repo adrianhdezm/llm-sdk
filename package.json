@@ -1,6 +1,6 @@
 {
   "name": "llm-sdk-node",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "This is just another SDK for the common LLM API providers.",
   "homepage": "https://github.com/adrianhdezm/llm-sdk-node#readme",
   "keywords": [
