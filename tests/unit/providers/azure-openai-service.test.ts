@@ -30,7 +30,8 @@ describe('AzureOpenAIProvider', () => {
             unit: { type: 'string', enum: ['celsius', 'fahrenheit'] }
           },
           required: ['location']
-        }
+        },
+        execute: (_params: object) => Promise.resolve('42')
       };
 
       const adaptedTool = provider.formatToolCallPayload(tool);

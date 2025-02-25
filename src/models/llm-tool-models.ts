@@ -4,6 +4,7 @@ export interface FunctionTool {
   description: string;
   parameters: object;
   strict?: boolean;
+  execute: (parameters: object) => string | Promise<string>;
 }
 
 export type LLMTool = FunctionTool;
