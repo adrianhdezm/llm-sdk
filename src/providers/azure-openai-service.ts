@@ -3,23 +3,20 @@ import type { LLMMessage } from '../models/llm-message-models';
 import type { LLMTool } from '../models/llm-tool-models';
 import { LLMService, type AssistantResponse } from '../llm-service';
 
+export interface AzureOpenAIServiceParams {
+  apiKey: string;
+  deployment: string;
+  endpoint: string;
+  apiVersion?: string;
+}
+
 export class AzureOpenAIService extends LLMService {
   #apiKey: string;
   #deployment: string;
   #endpoint: string;
   #apiVersion: string;
 
-  constructor({
-    apiKey,
-    deployment,
-    endpoint,
-    apiVersion = '2025-01-01-preview'
-  }: {
-    apiKey: string;
-    deployment: string;
-    endpoint: string;
-    apiVersion?: string;
-  }) {
+  constructor({ apiKey, deployment, endpoint, apiVersion = '2025-01-01-preview' }: AzureOpenAIServiceParams) {
     super();
     this.#apiKey = apiKey;
     this.#deployment = deployment;
