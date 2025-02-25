@@ -2,29 +2,29 @@ import type { CompletionTokenUsage, FinishReason, LLMOptions } from './models/ll
 import type { LLMAssistantMessage, LLMMessage } from './models/llm-message-models';
 import type { LLMTool } from './models/llm-tool-models';
 
-export interface AssistantMessageResponse {
+export interface AssistantResponse {
   message: LLMAssistantMessage;
   usage: CompletionTokenUsage;
   finishReason: FinishReason;
 }
 
-export abstract class LLMProvider {
+export abstract class LLMService {
   abstract getURL(): string;
-  abstract getRequestHeaders(): Record<string, string>;
+  abstract getHeaders(): Record<string, string>;
 
-  abstract transformMessage(message: LLMMessage): Record<string, unknown>;
-  abstract transformToolCall(tool: LLMTool): Record<string, unknown>;
-  abstract transformOptions(options: LLMOptions): Record<string, unknown>;
-  abstract transformMessageResponse(data: Record<string, unknown>): AssistantMessageResponse;
+  abstract formatMessagePayload(message: LLMMessage): Record<string, unknown>;
+  abstract formatToolCallPayload(tool: LLMTool): Record<string, unknown>;
+  abstract formatOptionsPayload(options: LLMOptions): Record<string, unknown>;
+  abstract parseAssistantResponse(data: Record<string, unknown>): AssistantResponse;
 
-  async createAssistantMessage(messages: LLMMessage[], tools?: LLMTool[], options?: LLMOptions): Promise<AssistantMessageResponse> {
+  async createAssistantMessage(messages: LLMMessage[], tools?: LLMTool[], options?: LLMOptions): Promise<AssistantResponse> {
     const url = this.getURL();
-    const headers = this.getRequestHeaders();
+    const headers = this.getHeaders();
 
     const body = {
-      messages: messages.map(this.transformMessage),
-      ...(tools && tools.length > 0 ? { tools: tools.map(this.transformToolCall) } : {}),
-      ...(options ? this.transformOptions(options) : {})
+      messages: messages.map(this.formatMessagePayload),
+      ...(tools && tools.length > 0 ? { tools: tools.map(this.formatToolCallPayload) } : {}),
+      ...(options ? this.formatOptionsPayload(options) : {})
     };
 
     const response = await fetch(url, {
@@ -41,7 +41,7 @@ export abstract class LLMProvider {
       throw new Error(`Failed to generate text: ${response.statusText}`);
     }
     const data = await response.json();
-    const messageResponse = this.transformMessageResponse(data);
+    const messageResponse = this.parseAssistantResponse(data);
 
     return messageResponse;
   }

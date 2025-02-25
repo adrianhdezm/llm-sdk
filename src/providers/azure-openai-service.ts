@@ -1,9 +1,9 @@
-import { LLMProvider, type AssistantMessageResponse } from '../llm-provider';
 import type { FinishReason, LLMOptions } from '../models/llm-models';
 import type { LLMMessage } from '../models/llm-message-models';
 import type { LLMTool } from '../models/llm-tool-models';
+import { LLMService, type AssistantResponse } from '../llm-service';
 
-export class AzureOpenAIProvider extends LLMProvider {
+export class AzureOpenAIService extends LLMService {
   #apiKey: string;
   #deployment: string;
   #endpoint: string;
@@ -31,11 +31,11 @@ export class AzureOpenAIProvider extends LLMProvider {
     return `${this.#endpoint}/openai/deployments/${this.#deployment}/chat/completions?api-version=${this.#apiVersion}`;
   }
 
-  getRequestHeaders(): Record<string, string> {
+  getHeaders(): Record<string, string> {
     return { 'api-key': this.#apiKey };
   }
 
-  transformToolCall(tool: LLMTool): Record<string, unknown> {
+  formatToolCallPayload(tool: LLMTool): Record<string, unknown> {
     return {
       type: 'function',
       function: {
@@ -47,7 +47,7 @@ export class AzureOpenAIProvider extends LLMProvider {
     };
   }
 
-  transformMessage(message: LLMMessage): Record<string, unknown> {
+  formatMessagePayload(message: LLMMessage): Record<string, unknown> {
     if (message.role === 'system') {
       return { role: message.role, content: message.content };
     } else if (message.role === 'user') {
@@ -93,7 +93,7 @@ export class AzureOpenAIProvider extends LLMProvider {
     }
   }
 
-  transformOptions(options: LLMOptions): Record<string, unknown> {
+  formatOptionsPayload(options: LLMOptions): Record<string, unknown> {
     return {
       ...(options.maxTokens ? { max_tokens: options.maxTokens } : {}),
       ...(options.temperature ? { temperature: options.temperature } : {}),
@@ -104,7 +104,7 @@ export class AzureOpenAIProvider extends LLMProvider {
     };
   }
 
-  transformMessageResponse(data: Record<string, unknown>): AssistantMessageResponse {
+  parseAssistantResponse(data: Record<string, unknown>): AssistantResponse {
     const responseData = data as {
       choices: {
         message: {

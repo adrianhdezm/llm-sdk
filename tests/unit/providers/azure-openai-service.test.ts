@@ -1,20 +1,20 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AzureOpenAIProvider } from '../../../src/providers/azure-openai-provider';
+import { AzureOpenAIService } from '../../../src/providers/azure-openai-service';
 import { LLMMessage } from '../../../src/models/llm-message-models';
 import { LLMTool } from '../../../src/models/llm-tool-models';
 
 describe('AzureOpenAIProvider', () => {
-  let provider: AzureOpenAIProvider;
+  let provider: AzureOpenAIService;
 
   beforeEach(() => {
-    provider = new AzureOpenAIProvider({
+    provider = new AzureOpenAIService({
       apiKey: 'test-api-key',
       deployment: 'test-deployment',
       endpoint: 'https://test-endpoint'
     });
   });
 
-  describe('transformToolCall', () => {
+  describe('formatToolCallPayload', () => {
     it('should correctly format a tool with json schema parameters', () => {
       const tool: LLMTool = {
         type: 'function',
@@ -33,7 +33,7 @@ describe('AzureOpenAIProvider', () => {
         }
       };
 
-      const adaptedTool = provider.transformToolCall(tool);
+      const adaptedTool = provider.formatToolCallPayload(tool);
 
       expect(adaptedTool).toEqual({
         type: 'function',
@@ -56,12 +56,12 @@ describe('AzureOpenAIProvider', () => {
     });
   });
 
-  describe('transformMessage', () => {
+  describe('formatMessagePayload', () => {
     describe('role:system', () => {
       it('should correctly format a message', () => {
         const message: LLMMessage = { role: 'system', content: 'Hello, how are you?' };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({ role: 'system', content: 'Hello, how are you?' });
       });
@@ -71,17 +71,9 @@ describe('AzureOpenAIProvider', () => {
       it('should correctly format a content with a string text message', () => {
         const message: LLMMessage = { role: 'assistant', content: 'The picture looks like a modern kitchen' };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({ role: 'assistant', content: 'The picture looks like a modern kitchen' });
-      });
-
-      it('should correctly format a content with text parts', () => {
-        const message: LLMMessage = { role: 'assistant', content: [{ type: 'text', text: 'The picture looks like a modern kitchen' }] };
-
-        const adaptedMessage = provider.transformMessage(message);
-
-        expect(adaptedMessage).toEqual({ role: 'assistant', content: [{ type: 'text', text: 'The picture looks like a modern kitchen' }] });
       });
 
       it('should correctly format toolCalls', () => {
@@ -98,7 +90,7 @@ describe('AzureOpenAIProvider', () => {
           ]
         };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({
           role: 'assistant',
@@ -121,7 +113,7 @@ describe('AzureOpenAIProvider', () => {
       it('should correctly format a message', () => {
         const message: LLMMessage = { role: 'tool', content: '42', toolCallId: 'call_abc123' };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({ role: 'tool', content: '42', tool_call_id: 'call_abc123' });
       });
@@ -131,7 +123,7 @@ describe('AzureOpenAIProvider', () => {
       it('should correctly format a content with a string text message', () => {
         const message: LLMMessage = { role: 'user', content: 'Hello, how are you?' };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({ role: 'user', content: 'Hello, how are you?' });
       });
@@ -139,7 +131,7 @@ describe('AzureOpenAIProvider', () => {
       it('should correctly format a content with text parts', () => {
         const message: LLMMessage = { role: 'user', content: [{ type: 'text', text: 'Hello, how are you?' }] };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({ role: 'user', content: [{ type: 'text', text: 'Hello, how are you?' }] });
       });
@@ -147,7 +139,7 @@ describe('AzureOpenAIProvider', () => {
       it('should correctly format a content with image parts', () => {
         const message: LLMMessage = { role: 'user', content: [{ type: 'image', image: '<image URL>' }] };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({ role: 'user', content: [{ type: 'image_url', image_url: { url: '<image URL>' } }] });
       });
@@ -161,7 +153,7 @@ describe('AzureOpenAIProvider', () => {
           ]
         };
 
-        const adaptedMessage = provider.transformMessage(message);
+        const adaptedMessage = provider.formatMessagePayload(message);
 
         expect(adaptedMessage).toEqual({
           role: 'user',

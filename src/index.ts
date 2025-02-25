@@ -5,9 +5,9 @@ export * from './models/llm-message-models';
 export * from './models/llm-tool-models';
 export * from './models/llm-models';
 
-// Re-export generation functions
+// Re-export services
 export * from './llm-generation';
+export * from './llm-service';
 
 // Re-export providers
-export * from './llm-provider';
-export * from './providers/azure-openai-provider';
+export * from './providers/azure-openai-service';

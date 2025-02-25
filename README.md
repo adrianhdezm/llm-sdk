@@ -11,9 +11,9 @@ npm install llm-sdk-node
 ## Usage
 
 ```typescript
-import { generateText, AzureOpenAIProvider } from 'llm-sdk-node';
+import { generateText, AzureOpenAIService } from 'llm-sdk-node';
 
-const llm = new AzureOpenAIProvider({
+const llm = new AzureOpenAIService({
   apiKey: 'YOUR_API_KEY',
   deployment: 'YOUR_DEPLOYMENT',
   endpoint: 'YOUR_ENDPOINT'
