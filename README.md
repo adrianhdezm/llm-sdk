@@ -1,17 +1,17 @@
-# llm-sdk-node
+# llm-sdk
 
 This is just another SDK for the common LLM API providers.
 
 ## Installation
 
 ```bash
-npm install llm-sdk-node
+npm install @ai-foundry/llm-sdk
 ```
 
 ## Usage
 
 ```typescript
-import { generateText, AzureOpenAIService } from 'llm-sdk-node';
+import { generateText, AzureOpenAIService } from '@ai-foundry/llm-sdk';
 
 const llm = new AzureOpenAIService({
   apiKey: 'YOUR_API_KEY',
