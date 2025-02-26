@@ -11,3 +11,6 @@ export * from './llm-service';
 
 // Re-export providers
 export * from './providers/azure-openai-service';
+
+// Re-export helpers
+export * from './helpers/function-tool-helpers';
