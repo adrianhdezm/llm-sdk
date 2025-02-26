@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { z } from 'zod';
-import { zodFunctionTool } from '../../src/helpers/function-tool-helpers';
+import { zodFunctionTool } from '../../../src/helpers/function-tool-helpers';
 
 describe('zodFunctionTool', () => {
   it('should create a valid function tool object', async () => {
