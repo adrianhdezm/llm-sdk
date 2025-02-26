@@ -2,7 +2,7 @@
   "name": "@ai-foundry/llm-sdk",
   "version": "0.0.2",
   "description": "This is just another SDK for the common LLM API providers.",
-  "homepage": "https://github.com/adrianhdezm/llm-sdk-node#readme",
+  "homepage": "https://github.com/adrianhdezm/llm-sdk#readme",
   "keywords": [
     "llm",
     "sdk",
@@ -12,10 +12,10 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adrianhdezm/llm-sdk-node.git"
+    "url": "git+https://github.com/adrianhdezm/llm-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/adrianhdezm/llm-sdk-node/issues"
+    "url": "https://github.com/adrianhdezm/llm-sdk/issues"
   },
   "files": [
     "dist",
