@@ -18,7 +18,7 @@ export interface TextResponse {
   toolCalls?: ToolCallPart[];
   toolResults?: ToolResultPart[];
   steps: AssistantResponse[];
-  conversation: LLMMessage[];
+  messages: LLMMessage[];
 }
 
 export async function generateText({ llm, messages, tools = [], maxSteps = 1, ...options }: GenerateTextParams): Promise<TextResponse> {
@@ -26,23 +26,23 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
     throw new Error('Messages array cannot be empty.');
   }
 
-  // Initialize the conversation with the provided messages
-  const conversation: LLMMessage[] = [...messages];
+  const conversationHistory: LLMMessage[] = [];
   const assistantResponses: AssistantResponse[] = [];
   const toolCalls: ToolCallPart[] = [];
   const toolResults: ToolResultPart[] = [];
   const toolService = new ToolService();
+
   let step = 0;
   let finalText: string | null = null;
   let finalFinishReason: FinishReason = 'stop';
 
   while (step < maxSteps) {
     // Generate the next assistant message
-    const assistantResponse = await llm.createAssistantMessage(conversation, tools, options);
+    const assistantResponse = await llm.createAssistantMessage([...messages, ...conversationHistory], tools, options);
     assistantResponses.push(assistantResponse);
 
     const { message: assistantMessage, finishReason } = assistantResponse;
-    conversation.push(assistantMessage);
+    conversationHistory.push(assistantMessage);
 
     // If there are any tool calls, handle them and push results to the conversation
     if (assistantMessage.toolCalls?.length) {
@@ -50,7 +50,7 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
 
       toolCalls.push(...assistantMessage.toolCalls);
       toolResults.push(...executedToolResults);
-      conversation.push(
+      conversationHistory.push(
         ...executedToolResults.map((toolResult) => ({
           role: 'tool' as const,
           toolCallId: toolResult.toolCallId,
@@ -95,6 +95,6 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
     ...(toolCalls.length > 0 ? { toolCalls } : {}),
     ...(toolResults.length > 0 ? { toolResults } : {}),
     steps: assistantResponses,
-    conversation
+    messages: [...conversationHistory]
   };
 }

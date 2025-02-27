@@ -37,7 +37,7 @@ describe('generateText', () => {
       expect(result.usage).toEqual(expectedUsage);
       expect(result.finishReason).toBe(expectedFinishReason);
       expect(result.steps.length).toBe(1);
-      expect(result.conversation.length).toBe(2);
+      expect(result.messages.length).toBe(1);
     });
 
     it('returns text and aggregated usage using a custom maxSteps', async () => {
@@ -62,7 +62,7 @@ describe('generateText', () => {
       expect(result.usage).toEqual(expectedUsage);
       expect(result.finishReason).toBe(expectedFinishReason);
       expect(result.steps.length).toBe(1);
-      expect(result.conversation.length).toBe(2);
+      expect(result.messages.length).toBe(1);
     });
   });
 
@@ -128,7 +128,7 @@ describe('generateText', () => {
       expect(result.toolResults).toEqual(expectedToolResults);
       expect(result.toolResults?.length).toBe(1);
       expect(result.steps.length).toBe(1);
-      expect(result.conversation.length).toBe(3);
+      expect(result.messages.length).toBe(2);
     });
 
     it('returns text and aggregated usage when a text prompt is provided', async () => {
@@ -184,7 +184,7 @@ describe('generateText', () => {
       expect(result.toolCalls).toEqual(expectedToolCalls);
       expect(result.toolResults).toEqual(expectedToolResults);
       expect(result.steps.length).toBe(2);
-      expect(result.conversation.length).toBe(4);
+      expect(result.messages.length).toBe(3);
     });
   });
 });
