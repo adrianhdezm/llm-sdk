@@ -16,6 +16,14 @@ export interface LLMToolCallPart {
   toolCallId: string;
 }
 
+export interface LLMToolResultPart {
+  type: 'function_result';
+  name: string;
+  arguments: string;
+  result: string;
+  toolCallId: string;
+}
+
 export interface LLMUserMessage {
   role: 'user';
   content: string | Array<LLMTextPart | LLMImagePart>;
