@@ -15,8 +15,8 @@ export interface TextResponse {
   text: string | null;
   usage: CompletionTokenUsage;
   finishReason: FinishReason;
-  toolCalls?: ToolCallPart[];
-  toolResults?: ToolResultPart[];
+  toolCalls: ToolCallPart[];
+  toolResults: ToolResultPart[];
   steps: AssistantResponse[];
   messages: LLMMessage[];
 }
@@ -92,8 +92,8 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
     text: finalText,
     usage,
     finishReason: finalFinishReason,
-    ...(toolCalls.length > 0 ? { toolCalls } : {}),
-    ...(toolResults.length > 0 ? { toolResults } : {}),
+    toolCalls,
+    toolResults,
     steps: assistantResponses,
     messages: [...conversationHistory]
   };
