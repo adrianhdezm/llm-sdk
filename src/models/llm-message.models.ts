@@ -1,22 +1,22 @@
-export interface LLMTextPart {
+export interface TextPart {
   type: 'text';
   text: string;
 }
 
-export interface LLMImagePart {
+export interface ImagePart {
   type: 'image';
   image: string | Uint8Array | Buffer | ArrayBuffer | URL;
   mimeType?: string;
 }
 
-export interface LLMToolCallPart {
+export interface ToolCallPart {
   type: 'function';
   name: string;
   arguments: string;
   toolCallId: string;
 }
 
-export interface LLMToolResultPart {
+export interface ToolResultPart {
   type: 'function_result';
   name: string;
   arguments: string;
@@ -26,7 +26,7 @@ export interface LLMToolResultPart {
 
 export interface LLMUserMessage {
   role: 'user';
-  content: string | Array<LLMTextPart | LLMImagePart>;
+  content: string | Array<TextPart | ImagePart>;
 }
 
 export interface LLMSystemMessage {
@@ -37,7 +37,7 @@ export interface LLMSystemMessage {
 export interface LLMAssistantMessage {
   role: 'assistant';
   content: null | string;
-  toolCalls?: Array<LLMToolCallPart>;
+  toolCalls?: Array<ToolCallPart>;
 }
 
 export interface LLMToolMessage {

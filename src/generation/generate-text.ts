@@ -1,5 +1,5 @@
 import type { CompletionTokenUsage, FinishReason, LLMOptions } from '../models/llm.models';
-import type { LLMMessage, LLMToolCallPart } from '../models/llm-message.models';
+import type { LLMMessage, ToolCallPart } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
 import type { AssistantResponse, LLMApiService } from '../services/llm-api.service';
 import { ToolService } from '../services/tool.service';
@@ -15,7 +15,7 @@ export interface TextResponse {
   text: string | null;
   usage: CompletionTokenUsage;
   finishReason: FinishReason;
-  toolCalls?: LLMToolCallPart[];
+  toolCalls?: ToolCallPart[];
   steps: AssistantResponse[];
   conversation: LLMMessage[];
 }
@@ -78,7 +78,7 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
   );
 
   // Aggregate all tool calls
-  const toolCalls = assistantResponses.reduce<LLMToolCallPart[]>((acc, response) => {
+  const toolCalls = assistantResponses.reduce<ToolCallPart[]>((acc, response) => {
     if (response.message.toolCalls) {
       acc.push(...response.message.toolCalls);
     }
