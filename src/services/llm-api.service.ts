@@ -1,6 +1,6 @@
-import type { CompletionTokenUsage, FinishReason, LLMOptions } from './models/llm-models';
-import type { LLMAssistantMessage, LLMMessage } from './models/llm-message-models';
-import type { LLMTool } from './models/llm-tool-models';
+import type { CompletionTokenUsage, FinishReason, LLMOptions } from '../models/llm.models';
+import type { LLMAssistantMessage, LLMMessage } from '../models/llm-message.models';
+import type { LLMTool } from '../models/llm-tool.models';
 
 export interface AssistantResponse {
   message: LLMAssistantMessage;
@@ -8,7 +8,7 @@ export interface AssistantResponse {
   finishReason: FinishReason;
 }
 
-export abstract class LLMService {
+export abstract class LLMApiService {
   abstract getURL(): string;
   abstract getHeaders(): Record<string, string>;
 

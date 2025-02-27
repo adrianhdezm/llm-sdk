@@ -1,7 +1,7 @@
-import type { FinishReason, LLMOptions } from '../models/llm-models';
-import type { LLMMessage } from '../models/llm-message-models';
-import type { LLMTool } from '../models/llm-tool-models';
-import { LLMService, type AssistantResponse } from '../llm-service';
+import type { FinishReason, LLMOptions } from '../../models/llm.models';
+import type { LLMMessage } from '../../models/llm-message.models';
+import type { LLMTool } from '../../models/llm-tool.models';
+import { LLMApiService, type AssistantResponse } from '../llm-api.service';
 
 export interface AzureOpenAIServiceParams {
   apiKey: string;
@@ -10,7 +10,7 @@ export interface AzureOpenAIServiceParams {
   apiVersion?: string;
 }
 
-export class AzureOpenAIService extends LLMService {
+export class AzureOpenAIService extends LLMApiService {
   #apiKey: string;
   #deployment: string;
   #endpoint: string;

@@ -1,6 +1,6 @@
 import type { infer as zodInfer, ZodType } from 'zod';
 import zodToJsonSchema from 'zod-to-json-schema';
-import type { FunctionTool } from '../models/llm-tool-models';
+import type { FunctionTool } from '../models/llm-tool.models';
 
 export function zodFunctionTool<Schema extends ZodType>(options: {
   name: string;

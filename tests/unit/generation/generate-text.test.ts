@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { generateText } from '../../src/llm-generation';
-import { AzureOpenAIService } from '../../src/providers/azure-openai-service';
-import { LLMMessage, LLMToolCallSegment } from '../../src/models/llm-message-models';
-import { LLMTool } from '../../src/models/llm-tool-models';
+import { generateText } from '../../../src/generation/generate-text';
+import { AzureOpenAIService } from '../../../src/services/providers/azure-openai.service';
+import { LLMMessage, LLMToolCallSegment } from '../../../src/models/llm-message.models';
+import { LLMTool } from '../../../src/models/llm-tool.models';
 
 describe('generateText', () => {
   let llm: AzureOpenAIService;
