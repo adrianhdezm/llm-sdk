@@ -1,12 +1,12 @@
-import type { LLMAssistantMessage, LLMToolMessage } from '../models/llm-message.models';
+import type { LLMAssistantMessage, ToolResultPart } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
 
 export class ToolService {
-  async executeToolCalls(assistantMessage: LLMAssistantMessage, tools: LLMTool[]): Promise<LLMToolMessage[]> {
-    const toolMessages: LLMToolMessage[] = [];
+  async executeToolCalls(assistantMessage: LLMAssistantMessage, tools: LLMTool[]): Promise<ToolResultPart[]> {
+    const toolResults: ToolResultPart[] = [];
 
     if (!assistantMessage.toolCalls) {
-      return toolMessages;
+      return toolResults;
     }
 
     // For each requested tool call, find and execute the corresponding tool
@@ -29,14 +29,15 @@ export class ToolService {
 
       const toolResponse = await tool.execute(toolParameters);
 
-      const toolMessage: LLMToolMessage = {
-        role: 'tool',
-        toolCallId: toolCall.toolCallId,
-        content: toolResponse
+      const toolMessage: ToolResultPart = {
+        type: 'function_result',
+        name: toolCall.name,
+        arguments: toolCall.arguments,
+        result: toolResponse,
+        toolCallId: toolCall.toolCallId
       };
-      toolMessages.push(toolMessage);
+      toolResults.push(toolMessage);
     }
-
-    return toolMessages;
+    return toolResults;
   }
 }

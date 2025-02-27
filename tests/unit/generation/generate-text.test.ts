@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { generateText } from '../../../src/generation/generate-text';
 import { AzureOpenAIService } from '../../../src/services/providers/azure-openai.service';
-import { LLMMessage, LLMToolCallPart } from '../../../src/models/llm-message.models';
+import { LLMMessage, ToolCallPart, ToolResultPart } from '../../../src/models/llm-message.models';
 import { LLMTool } from '../../../src/models/llm-tool.models';
 
 describe('generateText', () => {
@@ -90,12 +90,21 @@ describe('generateText', () => {
     };
 
     it('returns toolCalls and aggregated usage using default maxSteps', async () => {
-      const expectedToolCalls: LLMToolCallPart[] = [
+      const expectedToolCalls: ToolCallPart[] = [
         {
           type: 'function',
           toolCallId: '1',
           name: 'get_current_weather',
           arguments: '{"location":"San Francisco, CA"}'
+        }
+      ];
+      const expectedToolResults: ToolResultPart[] = [
+        {
+          type: 'function_result',
+          toolCallId: '1',
+          name: 'get_current_weather',
+          arguments: '{"location":"San Francisco, CA"}',
+          result: '42'
         }
       ];
 
@@ -116,18 +125,29 @@ describe('generateText', () => {
       expect(result.usage).toEqual({ promptTokens: 15, completionTokens: 38, totalTokens: 53 });
       expect(result.finishReason).toBe('tool-calls');
       expect(result.toolCalls).toEqual(expectedToolCalls);
+      expect(result.toolResults).toEqual(expectedToolResults);
+      expect(result.toolResults?.length).toBe(1);
       expect(result.steps.length).toBe(1);
       expect(result.conversation.length).toBe(3);
     });
 
     it('returns text and aggregated usage when a text prompt is provided', async () => {
       const expectedText = 'The current weather in San Francisco is 42 degrees Fahrenheit.';
-      const expectedToolCalls: LLMToolCallPart[] = [
+      const expectedToolCalls: ToolCallPart[] = [
         {
           type: 'function',
           toolCallId: '1',
           name: 'get_current_weather',
           arguments: '{"location":"San Francisco, CA"}'
+        }
+      ];
+      const expectedToolResults: ToolResultPart[] = [
+        {
+          type: 'function_result',
+          toolCallId: '1',
+          name: 'get_current_weather',
+          arguments: '{"location":"San Francisco, CA"}',
+          result: '42'
         }
       ];
       const expectedFinishReason = 'stop';
@@ -162,6 +182,7 @@ describe('generateText', () => {
       expect(result.usage).toEqual({ promptTokens: 95, completionTokens: 60, totalTokens: 155 });
       expect(result.finishReason).toBe(expectedFinishReason);
       expect(result.toolCalls).toEqual(expectedToolCalls);
+      expect(result.toolResults).toEqual(expectedToolResults);
       expect(result.steps.length).toBe(2);
       expect(result.conversation.length).toBe(4);
     });

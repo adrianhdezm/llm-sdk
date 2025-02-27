@@ -1,5 +1,5 @@
 import type { CompletionTokenUsage, FinishReason, LLMOptions } from '../models/llm.models';
-import type { LLMMessage, ToolCallPart } from '../models/llm-message.models';
+import type { LLMMessage, ToolCallPart, ToolResultPart } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
 import type { AssistantResponse, LLMApiService } from '../services/llm-api.service';
 import { ToolService } from '../services/tool.service';
@@ -16,6 +16,7 @@ export interface TextResponse {
   usage: CompletionTokenUsage;
   finishReason: FinishReason;
   toolCalls?: ToolCallPart[];
+  toolResults?: ToolResultPart[];
   steps: AssistantResponse[];
   conversation: LLMMessage[];
 }
@@ -28,8 +29,9 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
   // Initialize the conversation with the provided messages
   const conversation: LLMMessage[] = [...messages];
   const assistantResponses: AssistantResponse[] = [];
+  const toolCalls: ToolCallPart[] = [];
+  const toolResults: ToolResultPart[] = [];
   const toolService = new ToolService();
-
   let step = 0;
   let finalText: string | null = null;
   let finalFinishReason: FinishReason = 'stop';
@@ -44,8 +46,17 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
 
     // If there are any tool calls, handle them and push results to the conversation
     if (assistantMessage.toolCalls?.length) {
-      const toolMessages = await toolService.executeToolCalls(assistantMessage, tools);
-      conversation.push(...toolMessages);
+      const executedToolResults = await toolService.executeToolCalls(assistantMessage, tools);
+
+      toolCalls.push(...assistantMessage.toolCalls);
+      toolResults.push(...executedToolResults);
+      conversation.push(
+        ...executedToolResults.map((toolResult) => ({
+          role: 'tool' as const,
+          toolCallId: toolResult.toolCallId,
+          content: toolResult.result
+        }))
+      );
     }
 
     // If the model produced a final text response, capture it and stop
@@ -77,19 +88,12 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
     { promptTokens: 0, completionTokens: 0, totalTokens: 0 }
   );
 
-  // Aggregate all tool calls
-  const toolCalls = assistantResponses.reduce<ToolCallPart[]>((acc, response) => {
-    if (response.message.toolCalls) {
-      acc.push(...response.message.toolCalls);
-    }
-    return acc;
-  }, []);
-
   return {
     text: finalText,
     usage,
     finishReason: finalFinishReason,
     ...(toolCalls.length > 0 ? { toolCalls } : {}),
+    ...(toolResults.length > 0 ? { toolResults } : {}),
     steps: assistantResponses,
     conversation
   };
