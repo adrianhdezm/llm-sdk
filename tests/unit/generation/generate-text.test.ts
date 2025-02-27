@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { generateText } from '../../../src/generation/generate-text';
 import { AzureOpenAIService } from '../../../src/services/providers/azure-openai.service';
-import { LLMMessage, LLMToolCallSegment } from '../../../src/models/llm-message.models';
+import { LLMMessage, LLMToolCallPart } from '../../../src/models/llm-message.models';
 import { LLMTool } from '../../../src/models/llm-tool.models';
 
 describe('generateText', () => {
@@ -90,7 +90,7 @@ describe('generateText', () => {
     };
 
     it('returns toolCalls and aggregated usage using default maxSteps', async () => {
-      const expectedToolCalls: LLMToolCallSegment[] = [
+      const expectedToolCalls: LLMToolCallPart[] = [
         {
           type: 'function',
           toolCallId: '1',
@@ -122,7 +122,7 @@ describe('generateText', () => {
 
     it('returns text and aggregated usage when a text prompt is provided', async () => {
       const expectedText = 'The current weather in San Francisco is 42 degrees Fahrenheit.';
-      const expectedToolCalls: LLMToolCallSegment[] = [
+      const expectedToolCalls: LLMToolCallPart[] = [
         {
           type: 'function',
           toolCallId: '1',
