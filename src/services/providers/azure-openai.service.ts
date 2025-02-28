@@ -1,7 +1,7 @@
 import type { FinishReason, LLMOptions } from '../../models/llm.models';
 import type { LLMMessage } from '../../models/llm-message.models';
 import type { LLMTool } from '../../models/llm-tool.models';
-import { LLMApiService, type AssistantResponse } from '../llm-api.service';
+import { LLMApiService, type LLMApiResponse } from '../llm-api.service';
 
 export interface AzureOpenAIServiceParams {
   apiKey: string;
@@ -101,7 +101,7 @@ export class AzureOpenAIService extends LLMApiService {
     };
   }
 
-  parseAssistantResponse(data: Record<string, unknown>): AssistantResponse {
+  parseAssistantResponse(data: Record<string, unknown>): Omit<LLMApiResponse, 'request' | 'response'> {
     const responseData = data as {
       choices: {
         message: {

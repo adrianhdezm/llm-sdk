@@ -1,11 +1,13 @@
-import type { CompletionTokenUsage, FinishReason, LLMOptions } from '../models/llm.models';
+import type { CompletionTokenUsage, FinishReason, LLMOptions, LLMRequest, LLMResponse } from '../models/llm.models';
 import type { LLMAssistantMessage, LLMMessage } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
 
-export interface AssistantResponse {
+export interface LLMApiResponse {
   message: LLMAssistantMessage;
   usage: CompletionTokenUsage;
   finishReason: FinishReason;
+  request: LLMRequest;
+  response: LLMResponse;
 }
 
 export abstract class LLMApiService {
@@ -15,11 +17,14 @@ export abstract class LLMApiService {
   abstract formatMessagePayload(message: LLMMessage): Record<string, unknown>;
   abstract formatToolCallPayload(tool: LLMTool): Record<string, unknown>;
   abstract formatOptionsPayload(options: LLMOptions): Record<string, unknown>;
-  abstract parseAssistantResponse(data: Record<string, unknown>): AssistantResponse;
+  abstract parseAssistantResponse(data: Record<string, unknown>): Omit<LLMApiResponse, 'request' | 'response'>;
 
-  async createAssistantMessage(messages: LLMMessage[], tools?: LLMTool[], options?: LLMOptions): Promise<AssistantResponse> {
+  async createAssistantMessage(messages: LLMMessage[], tools?: LLMTool[], options?: LLMOptions): Promise<LLMApiResponse> {
     const url = this.getURL();
-    const headers = this.getHeaders();
+    const headers = {
+      'Content-Type': 'application/json',
+      ...this.getHeaders()
+    };
 
     const body = {
       messages: messages.map(this.formatMessagePayload),
@@ -29,10 +34,7 @@ export abstract class LLMApiService {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers
-      },
+      headers,
       body: JSON.stringify(body)
     });
     if (!response.ok) {
@@ -41,8 +43,22 @@ export abstract class LLMApiService {
       throw new Error(`Failed to generate text: ${response.statusText}`);
     }
     const data = await response.json();
-    const messageResponse = this.parseAssistantResponse(data);
+    const parsedResponse = this.parseAssistantResponse(data);
 
-    return messageResponse;
+    // Filter out sensitive headers
+    const sensitiveHeaders = ['authorization', 'api-key'];
+    const filteredHeaders = Object.fromEntries(Object.entries(headers).filter(([key]) => !sensitiveHeaders.includes(key.toLowerCase())));
+
+    return {
+      request: {
+        body,
+        headers: filteredHeaders
+      },
+      response: {
+        body: data,
+        headers: Object.fromEntries(response.headers.entries())
+      },
+      ...parsedResponse
+    };
   }
 }

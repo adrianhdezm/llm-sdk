@@ -1,7 +1,7 @@
 import type { CompletionTokenUsage, FinishReason, LLMOptions } from '../models/llm.models';
 import type { LLMMessage, ToolCallPart, ToolResultPart } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
-import type { AssistantResponse, LLMApiService } from '../services/llm-api.service';
+import type { LLMApiResponse, LLMApiService } from '../services/llm-api.service';
 import { ToolService } from '../services/tool.service';
 
 export interface GenerateTextParams extends LLMOptions {
@@ -17,8 +17,8 @@ export interface TextResponse {
   finishReason: FinishReason;
   toolCalls: ToolCallPart[];
   toolResults: ToolResultPart[];
-  steps: AssistantResponse[];
   messages: LLMMessage[];
+  steps: LLMApiResponse[];
 }
 
 export async function generateText({ llm, messages, tools = [], maxSteps = 1, ...options }: GenerateTextParams): Promise<TextResponse> {
@@ -27,7 +27,7 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
   }
 
   const conversationHistory: LLMMessage[] = [];
-  const assistantResponses: AssistantResponse[] = [];
+  const apiResponses: LLMApiResponse[] = [];
   const toolCalls: ToolCallPart[] = [];
   const toolResults: ToolResultPart[] = [];
   const toolService = new ToolService();
@@ -39,7 +39,7 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
   while (step < maxSteps) {
     // Generate the next assistant message
     const assistantResponse = await llm.createAssistantMessage([...messages, ...conversationHistory], tools, options);
-    assistantResponses.push(assistantResponse);
+    apiResponses.push(assistantResponse);
 
     const { message: assistantMessage, finishReason } = assistantResponse;
     conversationHistory.push(assistantMessage);
@@ -71,14 +71,14 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
 
   // If no text was returned but we hit our step limit, the last response might be relevant
   // or possibly the model never produced content. Use the last assistant response if available.
-  if (finalText === null && assistantResponses.length > 0) {
-    const lastResponse = assistantResponses.at(-1)!;
+  if (finalText === null && apiResponses.length > 0) {
+    const lastResponse = apiResponses.at(-1)!;
     finalText = lastResponse.message.content;
     finalFinishReason = lastResponse.finishReason;
   }
 
   // Calculate aggregated usage
-  const usage = assistantResponses.reduce(
+  const usage = apiResponses.reduce(
     (acc, response) => {
       acc.promptTokens += response.usage.promptTokens;
       acc.completionTokens += response.usage.completionTokens;
@@ -94,7 +94,7 @@ export async function generateText({ llm, messages, tools = [], maxSteps = 1, ..
     finishReason: finalFinishReason,
     toolCalls,
     toolResults,
-    steps: assistantResponses,
+    steps: apiResponses,
     messages: [...conversationHistory]
   };
 }
