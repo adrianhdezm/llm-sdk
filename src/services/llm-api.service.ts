@@ -1,10 +1,10 @@
-import type { CompletionTokenUsage, FinishReason, LLMOptions, LLMRequest, LLMResponse } from '../models/llm.models';
+import type { LLMTokensUsage, FinishReason, LLMOptions, LLMRequest, LLMResponse } from '../models/llm.models';
 import type { LLMAssistantMessage, LLMMessage } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
 
 export interface LLMApiResponse {
   message: LLMAssistantMessage;
-  usage: CompletionTokenUsage;
+  usage: LLMTokensUsage;
   finishReason: FinishReason;
   request: LLMRequest;
   response: LLMResponse;

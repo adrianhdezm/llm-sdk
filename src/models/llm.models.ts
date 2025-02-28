@@ -1,8 +1,6 @@
-import type { LLMAssistantMessage } from './llm-message.models';
-
 export type FinishReason = 'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown';
 
-export interface CompletionTokenUsage {
+export interface LLMTokensUsage {
   promptTokens: number;
   completionTokens: number;
   totalTokens: number;
