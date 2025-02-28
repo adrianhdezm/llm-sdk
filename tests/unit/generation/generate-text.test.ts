@@ -27,7 +27,9 @@ describe('generateText', () => {
       const spy = vi.spyOn(llm, 'createAssistantMessage').mockResolvedValueOnce({
         message: { role: 'assistant', content: expectedText },
         finishReason: expectedFinishReason,
-        usage: expectedUsage
+        usage: expectedUsage,
+        request: { body: {}, headers: {} },
+        response: { body: {}, headers: {} }
       });
 
       const result = await generateText({ llm, messages: [userMessage] });
@@ -50,7 +52,9 @@ describe('generateText', () => {
       const spy = vi.spyOn(llm, 'createAssistantMessage').mockResolvedValueOnce({
         message: { role: 'assistant', content: expectedText },
         finishReason: expectedFinishReason,
-        usage: expectedUsage
+        usage: expectedUsage,
+        request: { body: {}, headers: {} },
+        response: { body: {}, headers: {} }
       });
 
       const maxSteps = 4;
@@ -115,7 +119,9 @@ describe('generateText', () => {
           toolCalls: [...expectedToolCalls]
         },
         finishReason: 'tool-calls',
-        usage: { promptTokens: 15, completionTokens: 38, totalTokens: 53 }
+        usage: { promptTokens: 15, completionTokens: 38, totalTokens: 53 },
+        request: { body: {}, headers: {} },
+        response: { body: {}, headers: {} }
       });
 
       const result = await generateText({ llm, messages: [userMessage], tools: [weatherTool] });
@@ -161,7 +167,9 @@ describe('generateText', () => {
             toolCalls: [...expectedToolCalls]
           },
           finishReason: 'tool-calls',
-          usage: { promptTokens: 80, completionTokens: 22, totalTokens: 102 }
+          usage: { promptTokens: 80, completionTokens: 22, totalTokens: 102 },
+          request: { body: {}, headers: {} },
+          response: { body: {}, headers: {} }
         })
         .mockResolvedValueOnce({
           // second call
@@ -170,7 +178,9 @@ describe('generateText', () => {
             content: expectedText
           },
           finishReason: expectedFinishReason,
-          usage: { promptTokens: 15, completionTokens: 38, totalTokens: 53 }
+          usage: { promptTokens: 15, completionTokens: 38, totalTokens: 53 },
+          request: { body: {}, headers: {} },
+          response: { body: {}, headers: {} }
         });
 
       const maxSteps = 4;
