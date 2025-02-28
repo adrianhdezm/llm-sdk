@@ -1,21 +1,120 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { AzureOpenAIService } from '../../../../src/services/providers/azure-openai.service';
+import { AzureOpenAIService, AzureOpenAIServiceParams } from '../../../../src/services/providers/azure-openai.service';
 import { LLMMessage } from '../../../../src/models/llm-message.models';
 import { LLMTool } from '../../../../src/models/llm-tool.models';
 import { JSONObject } from '../../../../src/models/data.models';
 
 describe('AzureOpenAIProvider', () => {
-  let provider: AzureOpenAIService;
+  describe('constructor', () => {
+    describe('valid configurations', () => {
+      it('initializes correctly with URL-based configuration', () => {
+        const params = {
+          url: 'https://example.com',
+          headers: { 'Custom-Header': 'value' },
+          apiVersion: '2023-03-15'
+        };
+        const service = new AzureOpenAIService(params);
 
-  beforeEach(() => {
-    provider = new AzureOpenAIService({
-      apiKey: 'test-api-key',
-      deployment: 'test-deployment',
-      endpoint: 'https://test-endpoint'
+        expect(service.getURL()).toBe('https://example.com/chat/completions?api-version=2023-03-15');
+        expect(service.getHeaders()).toEqual({ 'Custom-Header': 'value' });
+      });
+
+      it('initializes correctly with endpoint-based configuration', () => {
+        const params = {
+          apiKey: 'my-api-key',
+          deployment: 'my-deployment',
+          endpoint: 'https://api.azure.com',
+          apiVersion: '2024-02-20'
+        };
+        const service = new AzureOpenAIService(params);
+
+        expect(service.getURL()).toBe('https://api.azure.com/openai/deployments/my-deployment/chat/completions?api-version=2024-02-20');
+        expect(service.getHeaders()).toEqual({ 'api-key': 'my-api-key' });
+      });
+
+      it('uses the default apiVersion when not provided (endpoint-based)', () => {
+        const params = {
+          apiKey: 'my-api-key',
+          deployment: 'my-deployment',
+          endpoint: 'https://api.azure.com'
+        };
+        const service = new AzureOpenAIService(params);
+
+        expect(service.getURL()).toBe(
+          'https://api.azure.com/openai/deployments/my-deployment/chat/completions?api-version=2025-01-01-preview'
+        );
+      });
+
+      it('uses the default apiVersion when not provided (URL-based)', () => {
+        const params = {
+          url: 'https://example.com',
+          headers: { 'Custom-Header': 'value' }
+        };
+        const service = new AzureOpenAIService(params);
+
+        expect(service.getURL()).toBe('https://example.com/chat/completions?api-version=2025-01-01-preview');
+      });
+    });
+
+    describe('invalid configurations', () => {
+      const errorMessage = 'Invalid parameters: provide either { apiKey, deployment, endpoint } or { url, headers }';
+
+      it('throws an error for completely invalid configuration', () => {
+        const invalidParams = { invalid: 'value' } as any;
+        expect(() => new AzureOpenAIService(invalidParams)).toThrow(errorMessage);
+      });
+
+      it('throws an error when combining deployment with headers', () => {
+        const invalidParams = {
+          url: 'https://example.com',
+          headers: { 'Custom-Header': 'value' },
+          deployment: 'my-deployment'
+        } as any;
+        expect(() => new AzureOpenAIService(invalidParams)).toThrow(errorMessage);
+      });
+
+      it('throws an error when combining apiKey with URL-based configuration', () => {
+        const invalidParams = {
+          url: 'https://example.com',
+          headers: { 'Custom-Header': 'value' },
+          apiKey: 'my-api-key'
+        } as any;
+        expect(() => new AzureOpenAIService(invalidParams)).toThrow(errorMessage);
+      });
+
+      it('throws an error when combining endpoint-based and URL-based keys', () => {
+        const invalidParams = {
+          url: 'https://example.com',
+          headers: { 'Custom-Header': 'value' },
+          endpoint: 'https://api.azure.com',
+          deployment: 'my-deployment',
+          apiKey: 'my-api-key'
+        } as any;
+        expect(() => new AzureOpenAIService(invalidParams)).toThrow(errorMessage);
+      });
+
+      it('throws an error when combining url with endpoint only', () => {
+        const invalidParams = {
+          url: 'https://example.com',
+          headers: { 'Custom-Header': 'value' },
+          endpoint: 'https://api.azure.com'
+        } as any;
+        expect(() => new AzureOpenAIService(invalidParams)).toThrow(errorMessage);
+      });
     });
   });
 
   describe('formatToolCallPayload', () => {
+    let provider: AzureOpenAIService;
+
+    beforeEach(() => {
+      provider = new AzureOpenAIService({
+        apiKey: 'test-api-key',
+        deployment: 'test-deployment',
+        endpoint: 'https://test-endpoint'
+      });
+    });
+
     it('should correctly format a tool with json schema parameters', () => {
       const tool: LLMTool = {
         type: 'function',
@@ -59,6 +158,16 @@ describe('AzureOpenAIProvider', () => {
   });
 
   describe('formatMessagePayload', () => {
+    let provider: AzureOpenAIService;
+
+    beforeEach(() => {
+      provider = new AzureOpenAIService({
+        apiKey: 'test-api-key',
+        deployment: 'test-deployment',
+        endpoint: 'https://test-endpoint'
+      });
+    });
+
     describe('role:system', () => {
       it('should correctly format a message', () => {
         const message: LLMMessage = { role: 'system', content: 'Hello, how are you?' };

@@ -11,8 +11,6 @@ export interface AzureOpenAIServiceEndpointParams {
   deployment: string;
   endpoint: string;
   apiVersion?: string;
-  url?: never;
-  headers?: never;
 }
 
 // URL-based configuration
@@ -20,9 +18,6 @@ export interface AzureOpenAIServiceUrlParams {
   url: string;
   headers: Record<string, string>;
   apiVersion?: string;
-  deployment?: never;
-  apiKey: never;
-  endpoint?: never;
 }
 
 export type AzureOpenAIServiceParams = AzureOpenAIServiceEndpointParams | AzureOpenAIServiceUrlParams;
@@ -43,10 +38,17 @@ export class AzureOpenAIService extends LLMApiService {
 
     this.#apiVersion = params.apiVersion || '2025-01-01-preview';
     if ('url' in params && 'headers' in params) {
+      if ('endpoint' in params || 'deployment' in params || 'apiKey' in params) {
+        throw new Error('Invalid parameters: provide either { apiKey, deployment, endpoint } or { url, headers }');
+      }
       // Using URL and headers configuration
       this.#url = params.url;
       this.#headers = params.headers;
     } else if ('endpoint' in params && 'deployment' in params && 'apiKey' in params) {
+      if ('url' in params || 'headers' in params) {
+        throw new Error('Invalid parameters: provide either { apiKey, deployment, endpoint } or { url, headers }');
+      }
+
       // Using endpoint-based configuration; apiKey is optional here.
       this.#apiKey = params.apiKey;
       this.#endpoint = params.endpoint;
