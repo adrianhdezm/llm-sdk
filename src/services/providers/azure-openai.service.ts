@@ -2,37 +2,73 @@ import type { FinishReason, LLMOptions } from '../../models/llm.models';
 import type { LLMMessage } from '../../models/llm-message.models';
 import type { LLMTool } from '../../models/llm-tool.models';
 import { LLMApiService, type LLMApiResponse } from '../llm-api.service';
+import type { JSONObject } from '../../models/data.models';
+import { isString } from '../../helpers/validation.helpers';
 
-export interface AzureOpenAIServiceParams {
+// Endpoint-based configuration
+export interface AzureOpenAIServiceEndpointParams {
   apiKey: string;
   deployment: string;
   endpoint: string;
   apiVersion?: string;
+  url?: never;
+  headers?: never;
 }
 
-export class AzureOpenAIService extends LLMApiService {
-  #apiKey: string;
-  #deployment: string;
-  #endpoint: string;
-  #apiVersion: string;
+// URL-based configuration
+export interface AzureOpenAIServiceUrlParams {
+  url: string;
+  headers: Record<string, string>;
+  apiVersion?: string;
+  deployment?: never;
+  apiKey: never;
+  endpoint?: never;
+}
 
-  constructor({ apiKey, deployment, endpoint, apiVersion = '2025-01-01-preview' }: AzureOpenAIServiceParams) {
+export type AzureOpenAIServiceParams = AzureOpenAIServiceEndpointParams | AzureOpenAIServiceUrlParams;
+
+export class AzureOpenAIService extends LLMApiService {
+  // Fields for endpoint-based configuration
+  #apiKey?: string;
+  #deployment?: string;
+  #endpoint?: string;
+  #apiVersion?: string;
+
+  // Fields for URL-based configuration
+  #url?: string;
+  #headers?: Record<string, string>;
+
+  constructor(params: AzureOpenAIServiceParams) {
     super();
-    this.#apiKey = apiKey;
-    this.#deployment = deployment;
-    this.#endpoint = endpoint;
-    this.#apiVersion = apiVersion;
+
+    this.#apiVersion = params.apiVersion || '2025-01-01-preview';
+    if ('url' in params && 'headers' in params) {
+      // Using URL and headers configuration
+      this.#url = params.url;
+      this.#headers = params.headers;
+    } else if ('endpoint' in params && 'deployment' in params && 'apiKey' in params) {
+      // Using endpoint-based configuration; apiKey is optional here.
+      this.#apiKey = params.apiKey;
+      this.#endpoint = params.endpoint;
+      this.#deployment = params.deployment;
+    } else {
+      throw new Error('Invalid parameters: provide either { apiKey, deployment, endpoint } or { url, headers }');
+    }
   }
 
   getURL(): string {
-    return `${this.#endpoint}/openai/deployments/${this.#deployment}/chat/completions?api-version=${this.#apiVersion}`;
+    const apiBaseUrl = this.#url || `${this.#endpoint}/openai/deployments/${this.#deployment}`;
+    return `${apiBaseUrl}/chat/completions?api-version=${this.#apiVersion}`;
   }
 
   getHeaders(): Record<string, string> {
-    return { 'api-key': this.#apiKey };
+    if (this.#headers) {
+      return this.#headers;
+    }
+    return this.#apiKey ? { 'api-key': this.#apiKey } : {};
   }
 
-  formatToolCallPayload(tool: LLMTool): Record<string, unknown> {
+  formatToolCallPayload(tool: LLMTool): JSONObject {
     return {
       type: 'function',
       function: {
@@ -44,16 +80,20 @@ export class AzureOpenAIService extends LLMApiService {
     };
   }
 
-  formatMessagePayload(message: LLMMessage): Record<string, unknown> {
+  formatMessagePayload(message: LLMMessage): JSONObject {
     if (message.role === 'system') {
       return { role: message.role, content: message.content };
     } else if (message.role === 'user') {
       if (Array.isArray(message.content)) {
         const content = message.content.map((part) => {
           if (part.type === 'text') {
-            return { type: 'text', text: part.text };
-          } else if (part.type === 'image') {
-            return { type: 'image_url', image_url: { url: part.image } };
+            const textPart = { type: 'text', text: part.text } as { type: string; text: string };
+            return textPart;
+          } else if (part.type === 'image' && isString(part.image)) {
+            const imagePart = { type: 'image_url', image_url: { url: part.image } } as { type: string; image_url: { url: string } };
+            return imagePart;
+          } else {
+            throw new Error(`Invalid part type in user message: ${part}`);
           }
         });
         return { role: message.role, content };
@@ -61,13 +101,8 @@ export class AzureOpenAIService extends LLMApiService {
         return { role: message.role, content: message.content };
       }
     } else if (message.role === 'assistant') {
-      if (Array.isArray(message.content)) {
-        const content = message.content.map((part) => {
-          if (part.type === 'text') {
-            return { type: 'text', text: part.text };
-          }
-        });
-        return { role: message.role, content };
+      if (message.content) {
+        return { role: message.role, content: message.content };
       } else if (Array.isArray(message.toolCalls) && message.toolCalls.length > 0) {
         const toolCalls = message.toolCalls.map((toolCall) => {
           return {
@@ -90,7 +125,7 @@ export class AzureOpenAIService extends LLMApiService {
     }
   }
 
-  formatOptionsPayload(options: LLMOptions): Record<string, unknown> {
+  formatOptionsPayload(options: LLMOptions): JSONObject {
     return {
       ...(options.maxTokens ? { max_tokens: options.maxTokens } : {}),
       ...(options.temperature ? { temperature: options.temperature } : {}),
@@ -102,7 +137,7 @@ export class AzureOpenAIService extends LLMApiService {
     };
   }
 
-  parseAssistantResponse(data: Record<string, unknown>): Omit<LLMApiResponse, 'request' | 'response'> {
+  parseAssistantResponse(data: JSONObject): Omit<LLMApiResponse, 'request' | 'response'> {
     const responseData = data as {
       choices: {
         message: {

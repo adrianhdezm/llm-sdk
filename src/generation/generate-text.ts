@@ -1,4 +1,4 @@
-import type { LLMTokensUsage, FinishReason, LLMOptions } from '../models/llm.models';
+import type { LLMTokensUsage, FinishReason, LLMOptions, LLMApiProviderOptions } from '../models/llm.models';
 import type { LLMMessage, ToolCallPart, ToolResultPart } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
 import type { LLMApiResponse, LLMApiService } from '../services/llm-api.service';
@@ -9,6 +9,7 @@ export interface GenerateTextParams extends LLMOptions {
   messages: LLMMessage[];
   tools?: LLMTool[];
   maxSteps?: number;
+  providerOptions?: LLMApiProviderOptions;
 }
 
 export interface TextResponse {

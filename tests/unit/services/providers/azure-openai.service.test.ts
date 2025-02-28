@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { AzureOpenAIService } from '../../../../src/services/providers/azure-openai.service';
 import { LLMMessage } from '../../../../src/models/llm-message.models';
 import { LLMTool } from '../../../../src/models/llm-tool.models';
+import { JSONObject } from '../../../../src/models/data.models';
 
 describe('AzureOpenAIProvider', () => {
   let provider: AzureOpenAIService;
@@ -31,7 +32,7 @@ describe('AzureOpenAIProvider', () => {
           },
           required: ['location']
         },
-        execute: (_params: object) => Promise.resolve('42')
+        execute: (_params: JSONObject) => Promise.resolve('42')
       };
 
       const adaptedTool = provider.formatToolCallPayload(tool);

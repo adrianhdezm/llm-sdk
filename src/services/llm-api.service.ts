@@ -1,6 +1,7 @@
-import type { LLMTokensUsage, FinishReason, LLMOptions, LLMRequest, LLMResponse } from '../models/llm.models';
+import type { LLMTokensUsage, FinishReason, LLMOptions, LLMRequest, LLMResponse, LLMApiProviderOptions } from '../models/llm.models';
 import type { LLMAssistantMessage, LLMMessage } from '../models/llm-message.models';
 import type { LLMTool } from '../models/llm-tool.models';
+import type { JSONObject } from '../models/data.models';
 
 export interface LLMApiResponse {
   message: LLMAssistantMessage;
@@ -14,16 +15,23 @@ export abstract class LLMApiService {
   abstract getURL(): string;
   abstract getHeaders(): Record<string, string>;
 
-  abstract formatMessagePayload(message: LLMMessage): Record<string, unknown>;
-  abstract formatToolCallPayload(tool: LLMTool): Record<string, unknown>;
-  abstract formatOptionsPayload(options: LLMOptions): Record<string, unknown>;
-  abstract parseAssistantResponse(data: Record<string, unknown>): Omit<LLMApiResponse, 'request' | 'response'>;
+  abstract formatMessagePayload(message: LLMMessage): JSONObject;
+  abstract formatToolCallPayload(tool: LLMTool): JSONObject;
+  abstract formatOptionsPayload(options: LLMOptions): JSONObject;
+  abstract parseAssistantResponse(data: JSONObject): Omit<LLMApiResponse, 'request' | 'response'>;
 
-  async createAssistantMessage(messages: LLMMessage[], tools?: LLMTool[], options?: LLMOptions): Promise<LLMApiResponse> {
+  async createAssistantMessage(
+    messages: LLMMessage[],
+    tools?: LLMTool[],
+    options?: LLMOptions & { providerOptions?: LLMApiProviderOptions }
+  ): Promise<LLMApiResponse> {
     const url = this.getURL();
+
+    const additionalHeaders = options?.providerOptions?.headers || {};
     const headers = {
       'Content-Type': 'application/json',
-      ...this.getHeaders()
+      ...this.getHeaders(),
+      ...additionalHeaders
     };
 
     const body = {

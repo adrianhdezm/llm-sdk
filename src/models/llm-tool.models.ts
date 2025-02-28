@@ -1,10 +1,12 @@
+import type { JSONObject } from './data.models';
+
 export interface FunctionTool {
   type: 'function';
   name: string;
   description: string;
-  parameters: object;
+  parameters: JSONObject;
   strict?: boolean;
-  execute: (parameters: object) => string | Promise<string>;
+  execute: (parameters: JSONObject) => string | Promise<string>;
 }
 
 export type LLMTool = FunctionTool;

@@ -1,3 +1,5 @@
+import type { JSONObject } from './data.models';
+
 export type FinishReason = 'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown';
 
 export interface LLMTokensUsage {
@@ -7,13 +9,17 @@ export interface LLMTokensUsage {
 }
 
 export interface LLMRequest {
-  body: Record<string, unknown>;
+  body: JSONObject;
   headers: Record<string, string>;
 }
 
 export interface LLMResponse {
-  body: Record<string, unknown>;
+  body: JSONObject;
   headers: Record<string, string>;
+}
+
+export interface LLMApiProviderOptions {
+  headers?: Record<string, string>;
 }
 
 export interface LLMOptions {

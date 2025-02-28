@@ -3,6 +3,7 @@ import { generateText } from '../../../src/generation/generate-text';
 import { AzureOpenAIService } from '../../../src/services/providers/azure-openai.service';
 import { LLMMessage, ToolCallPart, ToolResultPart } from '../../../src/models/llm-message.models';
 import { LLMTool } from '../../../src/models/llm-tool.models';
+import { JSONObject } from '../../../src/models/data.models';
 
 describe('generateText', () => {
   let llm: AzureOpenAIService;
@@ -78,7 +79,7 @@ describe('generateText', () => {
       name: 'get_current_weather',
       description: 'Get the current weather in a given location',
       strict: true,
-      execute: (_params: object) => Promise.resolve('42'),
+      execute: (_params: JSONObject) => Promise.resolve('42'),
       parameters: {
         type: 'object',
         properties: {
