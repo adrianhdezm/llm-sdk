@@ -97,7 +97,8 @@ export class AzureOpenAIService extends LLMApiService {
       ...(options.topP ? { top_p: options.topP } : {}),
       ...(options.frequencyPenalty ? { frequency_penalty: options.frequencyPenalty } : {}),
       ...(options.presencePenalty ? { presence_penalty: options.presencePenalty } : {}),
-      ...(options.stopSequences ? { stop: options.stopSequences } : {})
+      ...(options.stopSequences ? { stop: options.stopSequences } : {}),
+      ...(options.seed ? { seed: options.seed } : {})
     };
   }
 
