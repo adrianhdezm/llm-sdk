@@ -1,6 +1,6 @@
 {
   "name": "@ai-foundry/llm-sdk",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "This is just another SDK for the common LLM API providers.",
   "homepage": "https://github.com/adrianhdezm/llm-sdk#readme",
   "keywords": [
